@@ -23,7 +23,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): void {
-    this.userService.delete(Number(id));
+  delete(@Param('id') id: string): string {
+    const result = this.userService.delete(Number(id)); 
+    return result; 
   }
 }

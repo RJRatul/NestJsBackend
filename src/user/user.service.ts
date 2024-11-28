@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { User } from './user.interface';
-
+import { NotFoundException } from '@nestjs/common';
 @Injectable()
 export class UserService {
     private users: User[] = [];
@@ -29,7 +29,13 @@ export class UserService {
     }
 
     // Remove user by ID
-    delete(id: number): void {
+    delete(id: number): string {
+        const userToDelete = this.users.find((user) => user.id === id);
+        if (!userToDelete) {
+          throw new NotFoundException('User not found');
+        }
         this.users = this.users.filter((user) => user.id !== id);
-    }
+        return `${userToDelete.name} deleted successfully`;
+      }
+      
 }
