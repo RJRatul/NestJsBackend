@@ -32,10 +32,23 @@ export class UserService {
     delete(id: number): string {
         const userToDelete = this.users.find((user) => user.id === id);
         if (!userToDelete) {
-          throw new NotFoundException('User not found');
+            throw new NotFoundException('User not found');
         }
         this.users = this.users.filter((user) => user.id !== id);
         return `${userToDelete.name} deleted successfully`;
-      }
-      
+    }
+
+
+    // Update user by ID
+    update(id: number, updateUserDto: Partial<User>): User | undefined {
+        const user = this.users.find((user) => user.id === id);
+        if (!user) {
+            return undefined;
+        }
+
+        user.name = updateUserDto.name ?? user.name;
+        user.email = updateUserDto.email ?? user.email;
+
+        return user;
+    }
 }

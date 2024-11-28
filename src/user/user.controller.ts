@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Param, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Delete, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.interface';
 
@@ -24,7 +24,17 @@ export class UserController {
 
   @Delete(':id')
   delete(@Param('id') id: string): string {
-    const result = this.userService.delete(Number(id)); 
-    return result; 
+    const result = this.userService.delete(Number(id));
+    return result;
+  }
+
+  // PATCH request to update user by ID
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: Partial<User> 
+  ): User | undefined {
+    const updatedUser = this.userService.update(Number(id), updateUserDto);
+    return updatedUser; 
   }
 }
