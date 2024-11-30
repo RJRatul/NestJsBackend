@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Param, Body, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Delete, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.interface';
-
+import { CreateUserDto } from './dto/create-user.dto';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -13,8 +13,9 @@ export class UserController {
   }
 
   @Post()
-  create(@Body() user: User): User {
-    return this.userService.create(user);
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  create(@Body() createUserDto: CreateUserDto): User {
+    return this.userService.create(createUserDto);
   }
 
   @Get(':id')
@@ -28,7 +29,6 @@ export class UserController {
     return result;
   }
 
-  // PATCH request to update user by ID
   @Patch(':id')
   update(
     @Param('id') id: string,

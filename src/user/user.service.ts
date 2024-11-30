@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.interface';
 import { NotFoundException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
 @Injectable()
 export class UserService {
     private users: User[] = [];
@@ -12,15 +13,11 @@ export class UserService {
     }
 
     // Add a new user
-    create(user: User): User {
-        const newUser = { ...user };
-        if (!newUser.id) {
-            newUser.id = Date.now();
-        }
+    create(user: CreateUserDto): User {
+        const newUser: User  = { id: Date.now(), ...user };
         this.users.push(newUser);
         return newUser;
     }
-
 
 
     // Find user by ID
