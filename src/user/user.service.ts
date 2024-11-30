@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from './user.interface';
 import { NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
     private users: User[] = [];
@@ -14,11 +15,10 @@ export class UserService {
 
     // Add a new user
     create(user: CreateUserDto): User {
-        const newUser: User  = { id: Date.now(), ...user };
+        const newUser: User = { id: Date.now(), ...user };
         this.users.push(newUser);
         return newUser;
     }
-
 
     // Find user by ID
     findOne(id: number): User | undefined {
@@ -35,17 +35,14 @@ export class UserService {
         return `${userToDelete.name} deleted successfully`;
     }
 
-
     // Update user by ID
-    update(id: number, updateUserDto: Partial<User>): User | undefined {
+    update(id: number, updateUserDto: UpdateUserDto): User | undefined {
         const user = this.users.find((user) => user.id === id);
         if (!user) {
             return undefined;
         }
-
         user.name = updateUserDto.name ?? user.name;
-        user.email = updateUserDto.email ?? user.email;
-
         return user;
     }
+
 }

@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Param, Body, Delete, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Delete, Patch, UsePipes, ValidationPipe, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   findAll(): User[] {
@@ -30,11 +31,16 @@ export class UserController {
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   update(
     @Param('id') id: string,
-    @Body() updateUserDto: Partial<User> 
-  ): User | undefined {
+    @Body() updateUserDto: UpdateUserDto
+  ): User {
     const updatedUser = this.userService.update(Number(id), updateUserDto);
-    return updatedUser; 
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return updatedUser;
   }
+
 }
