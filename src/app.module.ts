@@ -8,11 +8,22 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot('mongodb://localhost:27017/miansAdmin'),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(
+      process.env.MONGODB_URI ||
+      (() => {
+        throw new Error('MONGODB_URI environment variable is not defined!');
+      })(),
+    ),
     UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('MongoDB URI:', process.env.MONGODB_URI);
+  }
+}
