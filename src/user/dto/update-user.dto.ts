@@ -1,9 +1,13 @@
 /* eslint-disable prettier/prettier */
-import {IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsEmail } from 'class-validator';
 
+export class UpdateUserDto {
+  @IsString()
+  @IsOptional() 
+  name?: string;
 
-export class UpdateUserDto{
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsOptional()
+  @IsEmail() 
+  email?: string;
 }

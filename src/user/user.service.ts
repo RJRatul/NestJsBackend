@@ -7,9 +7,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import { Model } from 'mongoose';
+import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel:Model<User>){}
+    constructor(@InjectModel(User.name) private userModel: Model<User>) { }
     private users: User[] = [];
 
     // Fetch all users
@@ -24,28 +25,51 @@ export class UserService {
     }
 
     // // Find user by ID
-    // findOne(id: number): User | undefined {
-    //     return this.users.find((user) => user.id === id);
-    // }
+    async findOne(id: string): Promise<User | null> {
+        return this.userModel.findById(id).exec();
+    }
+
 
     // // Remove user by ID
-    // delete(id: number): string {
-    //     const userToDelete = this.users.find((user) => user.id === id);
-    //     if (!userToDelete) {
-    //         throw new NotFoundException('User not found');
-    //     }
-    //     this.users = this.users.filter((user) => user.id !== id);
-    //     return `${userToDelete.name} deleted successfully`;
-    // }
+    async delete(id: string): Promise<boolean> {
+        try {
+            const result = await this.userModel.findByIdAndDelete(id).exec();
+            return result !== null;
+        } catch (error) {
+            throw new Error(`Error deleting user with ID ${id}: ${error.message}`);
+        }
+    }
+
+
 
     // // Update user by ID
-    // update(id: number, updateUserDto: UpdateUserDto): User | undefined {
-    //     const user = this.users.find((user) => user.id === id);
-    //     if (!user) {
-    //         return undefined;
-    //     } 
-    //     user.name = updateUserDto.name ?? user.name;
-    //     return user;
-    // }
+    async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+        try {
+            const user = await this.userModel.findById(id).exec(); // Fetch the user by ID
+            if (!user) {
+                throw new Error(`User with ID ${id} not found`); // Handle user not found
+            }
+
+            // Check for any fields other than 'name' and 'email' in the update request
+            const allowedFields = ['name', 'email'];
+            const updateFields = Object.keys(updateUserDto);
+
+            // If any field other than name or email is included, throw an error
+            const invalidFields = updateFields.filter(field => !allowedFields.includes(field));
+            if (invalidFields.length > 0) {
+                throw new Error(`Cannot update these fields: ${invalidFields.join(', ')}`);
+            }
+
+            // Update fields if provided
+            if (updateUserDto.name) user.name = updateUserDto.name;
+            if (updateUserDto.email) user.email = updateUserDto.email;
+
+            return user.save(); // Save the updated user to the database
+        } catch (error) {
+            throw new Error(`Error updating user with ID ${id}: ${error.message}`);
+        }
+    }
+
+
 
 }
