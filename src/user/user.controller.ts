@@ -11,7 +11,16 @@ export class UserController {
 
   @Get()
   findAll(): Promise<User[]> {
-    return this.userService.findAll();
+    try{
+      return this.userService.findAll();
+    } catch (error) {
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'There was a problem while procerssing the request',
+      }, HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
   }
 
   @Post()
