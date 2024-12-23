@@ -1,43 +1,47 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Param, Post, Body, UsePipes, ValidationPipe, HttpException, HttpStatus, Get, Delete, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  Post,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpStatus,
+  Get,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-// import { User } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   findAll(): Promise<User[]> {
     try {
       return this.userService.findAll();
     } catch (error) {
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'There was a problem while procerssing the request',
-      }, HttpStatus.INTERNAL_SERVER_ERROR, {
-        cause: error
-      });
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'There was a problem while procerssing the request',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: error,
+        },
+      );
     }
   }
 
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    try {
-      return await this.userService.create(createUserDto);
-    } catch (error) {
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'There was a problem while procerssing the request',
-      }, HttpStatus.INTERNAL_SERVER_ERROR, {
-        cause: error
-      });
-    }
-
+    return await this.userService.create(createUserDto);
   }
 
   @Get(':id')
@@ -50,7 +54,7 @@ export class UserController {
             status: HttpStatus.NOT_FOUND,
             error: `User with ID ${id} not found`,
           },
-          HttpStatus.NOT_FOUND
+          HttpStatus.NOT_FOUND,
         );
       }
       return user;
@@ -63,12 +67,10 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
         {
           cause: error,
-        }
+        },
       );
     }
   }
-
-
 
   @Delete(':id')
   async delete(@Param('id') id: string): Promise<{ message: string }> {
@@ -80,7 +82,7 @@ export class UserController {
             status: HttpStatus.NOT_FOUND,
             error: `User not found`,
           },
-          HttpStatus.NOT_FOUND
+          HttpStatus.NOT_FOUND,
         );
       }
 
@@ -95,15 +97,17 @@ export class UserController {
         HttpStatus.INTERNAL_SERVER_ERROR,
         {
           cause: error,
-        }
+        },
       );
     }
   }
 
-
   @Patch(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<any> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<any> {
     try {
       const updatedUser = await this.userService.update(id, updateUserDto);
       return {
@@ -121,6 +125,4 @@ export class UserController {
       );
     }
   }
-
-
 }
