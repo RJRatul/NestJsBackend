@@ -20,28 +20,27 @@ export class UserService {
 
   // Add a new user
   async create(user: CreateUserDto): Promise<User> {
+    const check_email = await this.userModel
+      .find({
+        email: user.email,
+      })
+      .exec();
+    const check_phone = await this.userModel
+      .find({
+        phone_number: user.phone_number,
+      })
+      .exec();
+    if (check_email.length > 0 || check_phone.length > 0) {
+      throw new HttpException(
+        {
+          status: HttpStatus.CONFLICT,
+          error: 'User already exists',
+        },
+        HttpStatus.CONFLICT,
+        {},
+      );
+    }
     try {
-      const check_email = await this.userModel
-        .find({
-          email: user.email,
-        })
-        .exec();
-      const check_phone = await this.userModel
-        .find({
-          phone_number: user.phone_number,
-        })
-        .exec();
-
-      if (check_email.length > 0 || check_phone.length > 0) {
-        throw new HttpException(
-          {
-            status: HttpStatus.CONFLICT,
-            error: 'User already exists',
-          },
-          HttpStatus.CONFLICT,
-          {},
-        );
-      }
       const newUser = new this.userModel(user);
       return newUser.save();
     } catch (error) {
